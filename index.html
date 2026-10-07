@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Sedang Maintenance</title>
+    <style>
+        /* Mengambil font modern dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Poppins:wght@300;500;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0f172a;
+            /* Background efek cahaya tipis */
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.15) 0px, transparent 50%);
+            font-family: 'Poppins', sans-serif;
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        /* Desain kotak kaca (Glassmorphism) */
+        .glass-container {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .icon-wrapper {
+            margin-bottom: 20px;
+        }
+
+        /* Animasi Roda Gigi Berputar */
+        .gear {
+            font-size: 48px;
+            display: inline-block;
+            animation: spin 4s linear infinite;
+            color: #38bdf8;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .countdown-wrapper {
+            margin-top: 20px;
+        }
+
+        /* Desain Angka Neon */
+        .timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 56px;
+            font-weight: 700;
+            color: #38bdf8;
+            text-shadow: 
+                0 0 10px rgba(56, 189, 248, 0.7),
+                0 0 20px rgba(56, 189, 248, 0.5),
+                0 0 40px rgba(56, 189, 248, 0.3);
+            /* Mencegah angka bergeser saat berubah (angka 1 dan 8 lebar sama) */
+            font-variant-numeric: tabular-nums; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Titik dua berkedip */
+        .colon {
+            animation: blink 1s step-end infinite;
+        }
+
+        /* Garis progress bar yang mengecil */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 100%;
+            background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
+            transition: width 1s linear;
+        }
+
+        /* Kotak Pseudo-Terminal */
+        .terminal {
+            margin-top: 30px;
+            background: #020617;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #22c55e;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: #22c55e;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+
+        /* Keyframes untuk Animasi */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Responsif untuk HP */
+        @media (max-width: 480px) {
+            .timer { font-size: 40px; }
+            .glass-container { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-container">
+        <div class="icon-wrapper">
+            <span class="gear">⚙️</span>
+        </div>
+        
+        <h1>Sistem Sedang Maintenance</h1>
+        <p>Mohon maaf, aplikasi kami sedang dalam perbaikan untuk meningkatkan performa. Silakan kembali dalam estimasi waktu berikut:</p>
+
+        <div class="countdown-wrapper">
+            <!-- Hitung Mundur -->
+            <div class="timer">
+                <span id="minutes">60</span><span class="colon">:</span><span id="seconds">00</span>
+            </div>
+            <!-- Progress bar bercahaya -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="terminal">
+            > System updating...<br>
+            > Optimizing database... [OK]<br>
+            > Deploying patches... <span class="cursor"></span>
+        </div>
+    </div>
+
+    <script>
+        // Set durasi hitung mundur dalam detik (60 menit x 60 detik = 3600 detik)
+        const totalSeconds = 3600; 
+        let currentSeconds = totalSeconds;
+
+        const minDisplay = document.getElementById('minutes');
+        const secDisplay = document.getElementById('seconds');
+        const progressBar = document.getElementById('progressBar');
+
+        function updateTimer() {
+            if (currentSeconds <= 0) {
+                clearInterval(interval);
+                minDisplay.textContent = "00";
+                secDisplay.textContent = "00";
+                progressBar.style.width = "0%";
+                return;
+            }
+
+            currentSeconds--;
+
+            // Hitung sisa menit dan detik
+            const minutes = Math.floor(currentSeconds / 60);
+            const seconds = currentSeconds % 60;
+
+            // Pastikan angka selalu ditampilkan dalam 2 digit (misal: 09, bukan 9)
+            minDisplay.textContent = minutes.toString().padStart(2, '0');
+            secDisplay.textContent = seconds.toString().padStart(2, '0');
+
+            // Hitung lebar progress bar berdasarkan persentase sisa waktu
+            const percentage = (currentSeconds / totalSeconds) * 100;
+            progressBar.style.width = percentage + "%";
+        }
+
+        // Jalankan fungsi updateTimer setiap 1000 milidetik (1 detik)
+        const interval = setInterval(updateTimer, 1000);
+    </script>
+
+</body>
+</html>
